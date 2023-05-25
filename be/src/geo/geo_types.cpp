@@ -476,6 +476,17 @@ std::string GeoPolygon::as_wkt() const {
     return ss.str();
 }
 
+bool GeoPoint::contains(const GeoShape* rhs) const {
+    switch (rhs->type()) {
+    case GEO_SHAPE_POINT: {
+        const GeoPoint* point = (const GeoPoint*)rhs;
+        return (this->x() == point->x() && this->y() == point->y());
+    }
+    default:
+        return false;
+    }
+}
+
 bool GeoPolygon::contains(const GeoShape* rhs) const {
     switch (rhs->type()) {
     case GEO_SHAPE_POINT: {
@@ -489,6 +500,17 @@ bool GeoPolygon::contains(const GeoShape* rhs) const {
     case GEO_SHAPE_POLYGON: {
         const GeoPolygon* other = (const GeoPolygon*)rhs;
         return _polygon->Contains(*other->polygon());
+    }
+    default:
+        return false;
+    }
+}
+
+bool GeoCircle::contains(const GeoShape* rhs) const {
+    switch (rhs->type()) {
+    case GEO_SHAPE_POINT: {
+        const GeoPoint* point = (const GeoPoint*)rhs;
+        return _cap->Contains(*point->point());
     }
     default:
         return false;
@@ -519,17 +541,6 @@ GeoParseStatus GeoCircle::init(double lng, double lat, double radius_meter) {
         return GEO_PARSE_CIRCLE_INVALID;
     }
     return GEO_PARSE_OK;
-}
-
-bool GeoCircle::contains(const GeoShape* rhs) const {
-    switch (rhs->type()) {
-    case GEO_SHAPE_POINT: {
-        const GeoPoint* point = (const GeoPoint*)rhs;
-        return _cap->Contains(*point->point());
-    }
-    default:
-        return false;
-    }
 }
 
 void GeoCircle::encode(std::string* buf) {

@@ -86,6 +86,8 @@ public:
 
     const S2Point* point() const { return _point.get(); }
 
+    bool contains(const GeoShape* rhs) const override;
+
     static bool ComputeDistance(double x_lng, double x_lat, double y_lng, double y_lat,
                                 double* distance);
 
